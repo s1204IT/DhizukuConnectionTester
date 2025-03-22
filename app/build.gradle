@@ -23,10 +23,6 @@ android {
         configureEach {
             signingConfig = signingConfigs.debug
         }
-        release {
-            minifyEnabled = true
-            shrinkResources = true
-        }
     }
 
     compileOptions {

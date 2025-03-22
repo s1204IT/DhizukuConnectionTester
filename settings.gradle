@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'Dhizuku Connextion Tester'
+rootProject.name = 'Dhizuku Connection Tester'
 include 'app'
