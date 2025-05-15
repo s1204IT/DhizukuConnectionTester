@@ -2,11 +2,15 @@ package me.s1204.inspect.dhizuku;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.rosan.dhizuku.api.Dhizuku;
@@ -18,7 +22,7 @@ public class Tester extends Activity implements View.OnClickListener {
     private IUserService mUserService;
 
     private void makeText(String msg) {
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show());
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -36,26 +40,35 @@ public class Tester extends Activity implements View.OnClickListener {
         findViewById(R.id.btn_stopUserService).setOnClickListener(this);
         findViewById(R.id.btn_bindUserService).setOnClickListener(this);
         findViewById(R.id.btn_unbindUserService).setOnClickListener(this);
+        findViewById(R.id.btn_setApplicationHidden).setOnClickListener(this);
+        findViewById(R.id.btn_setOrganizationName).setOnClickListener(this);
         findViewById(R.id.btn_lockNow).setOnClickListener(this);
+        findViewById(R.id.btn_setMasterVolumeMuted).setOnClickListener(this);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            findViewById(R.id.btn_setOrganizationName).setEnabled(false);
+        }
     }
 
     @Override
     public void onClick(final View v) {
-        DhizukuUserServiceArgs args = new DhizukuUserServiceArgs(new ComponentName(this, UserService.class));
-        ServiceConnection connection = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder iBinder) {
-                mUserService = IUserService.Stub.asInterface(iBinder);
-                makeText("Successfully connected to UserService");
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                makeText("Disconnected from UserService");
-            }
-        };
-
-        final int resId = v.getId();
         try {
+            EditText text = findViewById(R.id.text);
+            String string = text.getText().toString();
+            DhizukuUserServiceArgs args = new DhizukuUserServiceArgs(new ComponentName(this, UserService.class));
+            ServiceConnection connection = new ServiceConnection() {
+                @Override
+                public void onServiceConnected(ComponentName name, IBinder iBinder) {
+                    mUserService = IUserService.Stub.asInterface(iBinder);
+                    makeText("Successfully connected to UserService");
+                }
+                @Override
+                public void onServiceDisconnected(ComponentName name) {
+                    makeText("Disconnected from UserService");
+                }
+            };
+
+            final int resId = v.getId();
             if (resId == R.id.btn_init)
                 makeText("init：" + Dhizuku.init());
             else if (resId == R.id.btn_getVersionCode)
@@ -65,9 +78,9 @@ public class Tester extends Activity implements View.OnClickListener {
             else if (resId == R.id.btn_getOwnerPackageName)
                 makeText("getOwnerPackageName：" + Dhizuku.getOwnerPackageName());
             else if (resId == R.id.btn_getOwnerComponent)
-                makeText("getOwnerComponent：" + Dhizuku.getOwnerComponent());
+                makeText("getOwnerComponent：" + Dhizuku.getOwnerComponent().flattenToShortString());
             else if (resId == R.id.btn_isPermissionGranted)
-                makeText("isPermissionGranted：" +  Dhizuku.isPermissionGranted());
+                makeText("isPermissionGranted：" + Dhizuku.isPermissionGranted());
             else if (resId == R.id.btn_requestPermission) {
                 Dhizuku.requestPermission(new DhizukuRequestPermissionListener() {
                     @Override
@@ -75,8 +88,7 @@ public class Tester extends Activity implements View.OnClickListener {
                         Dhizuku.bindUserService(args, connection);
                     }
                 });
-            }
-            else if (resId == R.id.btn_startUserService)
+            } else if (resId == R.id.btn_startUserService)
                 Dhizuku.startUserService(args);
             else if (resId == R.id.btn_stopUserService)
                 Dhizuku.stopUserService(args);
@@ -84,14 +96,38 @@ public class Tester extends Activity implements View.OnClickListener {
                 makeText("bindUserService：" + Dhizuku.bindUserService(args, connection));
             else if (resId == R.id.btn_unbindUserService)
                 makeText("unbindService：" + Dhizuku.unbindUserService(connection));
-            else if (resId == R.id.btn_lockNow)
+            else if (resId == R.id.btn_setApplicationHidden) {
+                if (string.isEmpty()) {
+                    checkText(text);
+                } else {
+                    makeText("ApplicationHidden：" + mUserService.setApplicationHidden(string));
+                }
+            } else if (resId == R.id.btn_setOrganizationName) {
+                mUserService.setOrganizationName(string);
+                makeText("Executed.");
+            } else if (resId == R.id.btn_lockNow)
                 mUserService.lockNow();
-        } catch (NoClassDefFoundError | NoSuchMethodError | SecurityException | NullPointerException e) {
+            else if (resId == R.id.btn_setMasterVolumeMuted) {
+                makeText("MasterVolumeMuted：" + mUserService.setMasterVolumeMuted());
+            }
+        } catch (IllegalStateException | NoClassDefFoundError | NoSuchMethodError | SecurityException | NullPointerException e) {
             makeText(e.getMessage());
         } catch (RemoteException e) {
             String msg = e.getMessage();
-            makeText(msg == null ? "RemoteException was threw, but message is null." : msg);
+            makeText(msg == null ? "RemoteException was threw, but message was null." : msg);
         }
     }
 
+    private void checkText(EditText box) {
+        makeText("Please enter text.");
+        box.post(() -> {
+            // Focus
+            box.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                // Launch keyboard
+                imm.showSoftInput(box, InputMethodManager.SHOW_IMPLICIT);
+            }
+        });
+    }
 }
