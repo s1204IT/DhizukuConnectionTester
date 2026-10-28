@@ -11,7 +11,6 @@
         android:orientation="vertical"
         android:padding="30dp">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -188,6 +187,59 @@
                 android:textSize="16sp" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="1dp">
+
+            <Button
+                android:id="@+id/btn_resqueUserService"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="[Resque] Deallocate mUserService"
+                android:textAllCaps="false"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="1dp">
+
+            <Button
+                android:id="@+id/btn_delegatedScopes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="[Test] DelegatedScopes"
+                android:textAllCaps="false"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="1dp">
+
+            <Button
+                android:id="@+id/btn_lockTask"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:text="[Test] LockTask"
+                android:textAllCaps="false"
+                android:textSize="16sp" />
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="4dp"
@@ -237,22 +289,6 @@
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:text="setOrganizationName"
-                android:textAllCaps="false"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="1dp">
-
-            <Button
-                android:id="@+id/btn_lockNow"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:text="lockNow"
                 android:textAllCaps="false"
                 android:textSize="16sp" />
         </LinearLayout>
